@@ -36,12 +36,12 @@ def save_imu_data(bag, kitti, imu_frame_id, topic):
         imu.orientation.y = q[1]
         imu.orientation.z = q[2]
         imu.orientation.w = q[3]
-        imu.linear_acceleration.x = oxts.packet.af
-        imu.linear_acceleration.y = oxts.packet.al
-        imu.linear_acceleration.z = oxts.packet.au
-        imu.angular_velocity.x = oxts.packet.wf
-        imu.angular_velocity.y = oxts.packet.wl
-        imu.angular_velocity.z = oxts.packet.wu
+        imu.linear_acceleration.x = oxts.packet.ax
+        imu.linear_acceleration.y = oxts.packet.ay
+        imu.linear_acceleration.z = oxts.packet.az
+        imu.angular_velocity.x = oxts.packet.wx
+        imu.angular_velocity.y = oxts.packet.wy
+        imu.angular_velocity.z = oxts.packet.wz
         bag.write(topic, imu, t=imu.header.stamp)
 
 
@@ -281,10 +281,10 @@ def run_kitti2bag():
     # CAMERAS
     cameras = [
         (0, 'camera_gray_left', '/kitti/camera_gray_left'),
-        (1, 'camera_gray_right', '/kitti/camera_gray_right'),
-        (2, 'camera_color_left', '/kitti/camera_color_left'),
-        (3, 'camera_color_right', '/kitti/camera_color_right')
-    ]
+        (1, 'camera_gray_right', '/kitti/camera_gray_right')]
+#        (2, 'camera_color_left', '/kitti/camera_color_left'),
+#        (3, 'camera_color_right', '/kitti/camera_color_right')
+#    ]
 
     if args.kitti_type.find("raw") != -1:
     
@@ -324,10 +324,10 @@ def run_kitti2bag():
                 ('base_link', imu_frame_id, T_base_link_to_imu),
                 (imu_frame_id, velo_frame_id, inv(kitti.calib.T_velo_imu)),
                 (imu_frame_id, cameras[0][1], inv(kitti.calib.T_cam0_imu)),
-                (imu_frame_id, cameras[1][1], inv(kitti.calib.T_cam1_imu)),
-                (imu_frame_id, cameras[2][1], inv(kitti.calib.T_cam2_imu)),
-                (imu_frame_id, cameras[3][1], inv(kitti.calib.T_cam3_imu))
-            ]
+                (imu_frame_id, cameras[1][1], inv(kitti.calib.T_cam1_imu))]
+#                (imu_frame_id, cameras[2][1], inv(kitti.calib.T_cam2_imu)),
+#                (imu_frame_id, cameras[3][1], inv(kitti.calib.T_cam3_imu))
+#            ]
 
             util = pykitti.utils.read_calib_file(os.path.join(kitti.calib_path, 'calib_cam_to_cam.txt'))
 
@@ -339,7 +339,7 @@ def run_kitti2bag():
             save_gps_vel_data(bag, kitti, imu_frame_id, gps_vel_topic)
             for camera in cameras:
                 save_camera_data(bag, args.kitti_type, kitti, util, bridge, camera=camera[0], camera_frame_id=camera[1], topic=camera[2], initial_time=None)
-            save_velo_data(bag, kitti, velo_frame_id, velo_topic)
+#            save_velo_data(bag, kitti, velo_frame_id, velo_topic)
 
         finally:
             print("## OVERVIEW ##")
